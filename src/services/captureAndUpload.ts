@@ -1,4 +1,5 @@
-import puppeteer from "puppeteer";
+import puppeteer from "puppeteer-core";
+import chromium from "@sparticuz/chromium";
 import { v2 as cloudinary } from "cloudinary";
 
 cloudinary.config({
@@ -18,7 +19,9 @@ export async function captureAndUpload(job: ScreenshotJob): Promise<void> {
 
   console.log(`[${jobId}] Launching browser for: ${targetUrl}`);
   const browser = await puppeteer.launch({
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    args: chromium.args,
+    executablePath: await chromium.executablePath(),
+    headless: chromium.headless,
   });
 
   let screenshotUrl: string;
