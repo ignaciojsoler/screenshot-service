@@ -1,5 +1,4 @@
 import puppeteer from "puppeteer-core";
-import chromium from "@sparticuz/chromium";
 import { v2 as cloudinary } from "cloudinary";
 
 cloudinary.config({
@@ -17,11 +16,9 @@ export interface ScreenshotJob {
 export async function captureAndUpload(job: ScreenshotJob): Promise<void> {
   const { jobId, targetUrl, callbackUrl } = job;
 
-  console.log(`[${jobId}] Launching browser for: ${targetUrl}`);
-  const browser = await puppeteer.launch({
-    args: chromium.args,
-    executablePath: await chromium.executablePath(),
-    headless: chromium.headless,
+  console.log(`[${jobId}] Connecting to browserless for: ${targetUrl}`);
+  const browser = await puppeteer.connect({
+    browserWSEndpoint: `wss://chrome.browserless.io?token=${process.env.BROWSERLESS_TOKEN}`,
   });
 
   let screenshotUrl: string;
@@ -50,7 +47,7 @@ export async function captureAndUpload(job: ScreenshotJob): Promise<void> {
     screenshotUrl = result.secure_url;
     console.log(`[${jobId}] Uploaded: ${screenshotUrl}`);
   } finally {
-    await browser.close();
+    await browser.disconnect();
   }
 
   if (callbackUrl) {
