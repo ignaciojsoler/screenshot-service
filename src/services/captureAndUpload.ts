@@ -26,7 +26,7 @@ export async function captureAndUpload(job: ScreenshotJob): Promise<void> {
   try {
     const page = await browser.newPage();
     await page.setViewport({ width: 1280, height: 800 });
-    await page.goto(targetUrl, { waitUntil: "networkidle2" });
+    await page.goto(targetUrl, { waitUntil: "load", timeout: 30000 });
     console.log(`[${jobId}] Page loaded, taking screenshot`);
 
     const buffer = await page.screenshot({ type: "png" });
