@@ -1,4 +1,5 @@
 import { Router, Request, Response } from "express";
+import { waitUntil } from "@vercel/functions";
 import { captureAndUpload } from "../services/captureAndUpload";
 
 const router = Router();
@@ -17,9 +18,11 @@ router.post("/", (req: Request, res: Response): void => {
 
   res.status(202).json({ status: "accepted", jobId });
 
-  captureAndUpload({ jobId, targetUrl, callbackUrl }).catch((err) => {
-    console.error(`[${jobId}] Failed:`, err);
-  });
+  waitUntil(
+    captureAndUpload({ jobId, targetUrl, callbackUrl }).catch((err) => {
+      console.error(`[${jobId}] Failed:`, err);
+    })
+  );
 });
 
 export default router;
